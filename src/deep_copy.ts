@@ -1,4 +1,16 @@
-const obj = {
+interface Address {
+  street: string;
+  zipCode: string;
+}
+
+interface Person {
+  name: string;
+  age: number;
+  city: string;
+  address: Address;
+}
+
+const obj: Person = {
   name: "John",
   age: 20,
   city: "New York",
@@ -8,29 +20,25 @@ const obj = {
   },
 };
 
-// Create copies BEFORE modifying the original
-const shallowCopy = { ...obj };
-const deepCopy = JSON.parse(JSON.stringify(obj));
+const shallowCopy: Person = { ...obj };
+const deepCopy: Person = JSON.parse(JSON.stringify(obj));
 
-const makeDeepCopy = (obj) => {
-  // check if the target is a reference type
+const makeDeepCopy = <T extends Record<string, any>>(obj: T): T => {
   if (typeof obj === "object" && obj !== null) {
-    // correctly register the target as array or object
-    const result = Array.isArray(obj) ? [] : {};
+    const result = Array.isArray(obj) ? [] as any : {} as any;
     for (const key in obj) {
-      // skip inherited properties, so things like __proto__ is not copied
       if (obj.hasOwnProperty(key)) {
         result[key] = makeDeepCopy(obj[key]);
       }
     }
-    return result;
+    return result as T;
   } else {
-    return obj;
+    return obj as T;
   }
 };
-const deepCopy2 = makeDeepCopy(obj);
 
-// Now modify the original object (including nested properties)
+const deepCopy2: Person = makeDeepCopy(obj);
+
 obj.city = "Los Angeles";
 obj.address.street = "456 Oak Ave";
 
